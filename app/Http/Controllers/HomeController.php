@@ -23,6 +23,13 @@ class HomeController extends Controller
      */
     public function index()
     {
-        return view('home');
+        $product = \App\Product::first();
+        $user = \TCG\Voyager\Models\User::first();
+        $table = \App\Table::first();
+        return view('home')->with('permission', [
+            'product' => $product,
+            'user' => $user,
+            'table' => $table
+        ]);
     }
 }

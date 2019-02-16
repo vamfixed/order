@@ -1,4 +1,6 @@
 <!-- Main Sidebar Container -->
+
+
 <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Brand Logo -->
     <a href="index3.html" class="brand-link">
@@ -48,39 +50,47 @@
                         </p>
                     </router-link>
                 </li>
+                @can('browse', $permission['product'])
+                    <li class="nav-item">
+                        <a href="/admin/products" class="nav-link">
+                            <i class="nav-icon fa fa-shopping-bag"></i>
+                            <p>
+                                Products
+                            </p>
+                        </a>
+                    </li>
+                @endcan
+               
 
+                @can('browse', $permission['table'])
+                    <li class="nav-item">
+                        <a href="/admin/tables" class="nav-link">
+                            <i class="nav-icon fa fa-chair"></i>
+                            <p>
+                                Tables
+                            </p>
+                        </a>
+                    </li>
+                @endcan
+                @can('browse', $permission['user'])
+                    <li class="nav-item">
+                        <a href="/admin/users" class="nav-link">
+                            <i class="nav-icon fa fa-user"></i>
+                            <p>
+                                Users
+                            </p>
+                        </a>
+                    </li>
+                @endcan
+                
                 <li class="nav-item">
-                    <router-link to="/product" class="nav-link">
-                        <i class="nav-icon fa fa-shopping-bag"></i>
-                        <p>
-                            Products
-                        </p>
-                    </router-link>
-                </li>
-                <li class="nav-item">
-                    <router-link to="/table" class="nav-link">
-                        <i class="nav-icon fa fa-chair"></i>
-                        <p>
-                            Tables
-                        </p>
-                    </router-link>
-                </li>
-                <li class="nav-item">
-                    <router-link to="/user" class="nav-link">
-                        <i class="nav-icon fa fa-user"></i>
-                        <p>
-                            Users
-                        </p>
-                    </router-link>
-                </li>
-                {{-- <li class="nav-item">
                     <router-link to="/report" class="nav-link">
                         <i class="nav-icon fa fa-book"></i>
                         <p>
                             Reports
                         </p>
                     </router-link>
-                </li> --}}
+                </li>
                 <li class="nav-item">
                     
                     <a class="nav-link" href="{{ route('logout') }}" onclick="event.preventDefault();

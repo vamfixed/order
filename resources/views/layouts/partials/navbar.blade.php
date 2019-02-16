@@ -13,18 +13,25 @@
         <li class="nav-item d-none d-sm-inline-block">
           <router-link to="/dinein" class="nav-link">Dine In</router-link>
         </li>
+        
         <li class="nav-item d-none d-sm-inline-block">
           <router-link to="/order" class="nav-link">Orders</router-link>
         </li>
+        @can('browse', $permission['product'])
         <li class="nav-item d-none d-sm-inline-block">
             <router-link to="/product" class="nav-link">Products</router-link>
         </li>
+        @endcan
+        @can('browse', $permission['table'])
         <li class="nav-item d-none d-sm-inline-block">
             <router-link to="/table" class="nav-link">Tables</router-link>
         </li>
+        @endcan
+        @can('browse', $permission['user'])
         <li class="nav-item d-none d-sm-inline-block">
             <router-link to="/user" class="nav-link">Users</router-link>
         </li>
+        @endcan
         <li class="nav-item d-none d-sm-inline-block">
             <router-link to="/report" class="nav-link">Reports</router-link>
         </li>
