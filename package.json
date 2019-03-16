@@ -26,9 +26,12 @@
     "dependencies": {
         "@fortawesome/fontawesome-free": "^5.7.1",
         "admin-lte": "^3.0.0-alpha.2",
+        "moment-timezone": "^0.5.23",
         "sweetalert2": "^8.0.6",
         "vform": "^1.0.0",
+        "vue-moment": "^4.0.0",
         "vue-progressbar": "^0.7.5",
-        "vue-router": "^3.0.2"
+        "vue-router": "^3.0.2",
+        "vue-select": "^2.6.0"
     }
 }

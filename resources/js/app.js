@@ -14,7 +14,9 @@ import { Form, HasError, AlertError } from 'vform'
 // ES6 Modules or TypeScript
 import Swal from 'sweetalert2'
 import VueProgressBar from 'vue-progressbar'
-
+import vSelect from 'vue-select'
+import VueMoment from 'vue-moment'
+import moment from 'moment-timezone'
 const options = {
 color: '#21a1e1',
 failedColor: '#874b4b',
@@ -30,7 +32,10 @@ inverse: false
 }
   
 Vue.use(VueProgressBar, options)
-  
+
+Vue.use(VueMoment, {
+    moment,
+})
 
 window.Form = Form;
 window.Swal = Swal;
@@ -43,6 +48,7 @@ timer: 3000
 Vue.use(VueRouter);
 Vue.component(HasError.name, HasError)
 Vue.component(AlertError.name, AlertError)
+Vue.component('v-select', vSelect)
 const routes = [
 
     { path: '/home', component: require('./components/Home.vue').default, },

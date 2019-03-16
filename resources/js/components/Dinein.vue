@@ -6,9 +6,9 @@
                     <div class="card-header">{{ table.table_number }}</div>
                     <div class="card-body">
                         <h5 class="card-title">Capacity: {{ table.capacity }}</h5>
-                        <p class="card-text">Status: {{ table.status }}</p>
+                        <p class="card-text">Status: {{ table.status }} {{ table.order_status == null ? "" : "(" + table.order_status + ")" }}</p>
                         <p class="card-text">Available? {{ table.available == "1" ? "YES" : "NO" }}</p>
-                        <button class="btn btn-xs btn-success" @click="pay(table)" v-if="table.available == '0'">Pay
+                        <button class="btn btn-xs btn-success" @click="pay(table)" v-if="table.available == '0' && table.order_status == 'SERVED'">Pay
                             <i class="fas fa-money-bill-alt"></i>
                         </button>
                         <button class="btn btn-xs btn-secondary" @click="dineIn(table)" v-if="table.available == '1'">Dine In
@@ -80,7 +80,7 @@
                             </thead>
                             <tbody>
                                 <tr v-for="orderItem in vorderItems" :key="orderItem.id">
-                                    <td>{{ orderItem.products_id }}</td>
+                                    <td>{{ orderItem.products.product_name }}</td>
                                     <td class="text-right">{{ orderItem.qty }}</td>
                                     <td class="text-right">{{ orderItem.rate }}</td>
                                     <td class="text-right">{{ orderItem.amount }}</td>
@@ -115,17 +115,23 @@
                     </div>
                     <div class="modal-body">
                         <div class="row mb-3">
-                            <div class="col-md-12">
+                            <!-- <div class="col-md-12">
                                 <div class="form-group">
                                     <label>Product</label>
-                                    <select @change="updateOrderItem()" v-model="orderItem.product_id" name="product_id" class="form-control">
+                                    <select data-placeholder="Select a product" @change="updateOrderItem()" v-model="orderItem.product_id" name="product_id" id="product_id" width="100%" class="form-control">
                                         <option v-for="product in products" v-bind:value="product.id" v-bind:key="product.id">
                                             {{ product.product_name + ": " + product.product_description }}
                                         </option>
                                     </select>
                                 </div>
+                            </div> -->
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Product</label>
+                                    <v-select label="product_name" v-model="selected" :options="products" @change="updateOrderItem()">
+                                    </v-select>
+                                </div>
                             </div>
-
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label>Price</label>
@@ -212,6 +218,7 @@
     export default {
         data() {
             return {
+                selected: null,
                 orderItem: {
                     product_id: null,
                     product_name: null,
@@ -255,7 +262,7 @@
         },
         methods: {
             savePayment() {
-                if (this.change < 0) {
+                if (this.payment.change < 0) {
                     this.ToastMessage("Please check the amount!", "error");
                     return;
                 }
@@ -315,10 +322,11 @@
                 this.payment.change = (this.payment.cash - this.payment.total_amount).toFixed(2);
             },
             updateOrderItem() {
-                var values = this.products.map(function(o) { return o.id });
-                var index = values.indexOf(this.orderItem.product_id); 
-                var itemSelected = this.products[index];
-
+                // var values = this.products.map(function(o) { return o.id });
+                // var index = values.indexOf(this.orderItem.product_id); 
+                // var itemSelected = this.products[index];
+                var itemSelected = this.selected;
+                this.orderItem.product_id = itemSelected.id;
                 this.orderItem.product_name = itemSelected.product_name;
                 this.orderItem.price = itemSelected.price;
                 this.orderItem.quantity = 1;
@@ -362,6 +370,7 @@
                     this.tables = res.data.tables;
                     this.products = res.data.products;
                     this.$Progress.finish();
+
                 })
                 .catch(error => {
                     this.$Progress.fail();

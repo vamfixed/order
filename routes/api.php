@@ -56,13 +56,23 @@ Route::post('/dinein/save/', function() {
 
 Route::get('/dinein/tables', function () {
     return [
-        'tables' => DB::select('SELECT a.*, (SELECT x.id FROM orders AS x WHERE x.tables_id = a.id AND x.paid_amount IS NULL LIMIT 1) as order_id, (SELECT x.total_amount FROM orders AS x WHERE x.tables_id = a.id AND x.paid_amount IS NULL LIMIT 1) as total_amount FROM tables AS a'),
+        'tables' => DB::select('SELECT a.*, (SELECT x.id FROM orders AS x WHERE x.tables_id = a.id AND x.paid_amount IS NULL LIMIT 1) as order_id, (SELECT x.total_amount FROM orders AS x WHERE x.tables_id = a.id AND x.paid_amount IS NULL LIMIT 1) as total_amount, (SELECT x.status FROM orders AS x WHERE x.tables_id = a.id AND x.paid_amount IS NULL LIMIT 1) as order_status FROM tables AS a'),
         'products' => App\Product::where('active', '1')->get()
     ];
 });
 
+Route::get('/order/get/', function() {
+    return App\Order::where('status', '=', 'PENDING')->with(['orderItems', 'table', 'orderItems.products'])->get();
+});
+
+Route::get('/order/serve/{id}', function($id) {
+   $order = App\Order::findOrFail($id);
+   $order->status = 'SERVED';
+   $order->save();
+});
+
 Route::get('/dinein/orders/{id}', function ($id) {
-    return App\OrderItem::where('orders_id', $id)->get();
+    return App\OrderItem::where('orders_id', $id)->with('products')->get();
 });
 
 Route::post('/dinein/payment/', function() {
@@ -79,7 +89,3 @@ Route::post('/dinein/payment/', function() {
     $table->save();
     return $data;
 });
-
-Route::resource('order', 'OrderController');
-
-
