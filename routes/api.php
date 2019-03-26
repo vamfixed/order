@@ -15,11 +15,7 @@ use Carbon\Carbon;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
-});
 Route::post('/dinein/save/', function() {
-    $this->middleware('auth');
     $data = Input::all();
     //SELECT `id`, `bill_no`, `order_date`, `total_amount`, 
     //`paid_amount`, `change_amount`, `status`, `tables_id`, 
@@ -33,7 +29,7 @@ Route::post('/dinein/save/', function() {
     }, $data['items']));
     $order->status = 'PENDING';
     $order->tables_id = $data['table']['id'];
-    $order->users_id = Auth::id();
+    $order->users_id = $data['user']['id'];
     $order->save();
     
     foreach ($data['items'] as $item) {
@@ -57,18 +53,18 @@ Route::post('/dinein/save/', function() {
 Route::get('/dinein/tables', function () {
     return [
         'tables' => DB::select('SELECT a.*, (SELECT x.id FROM orders AS x WHERE x.tables_id = a.id AND x.paid_amount IS NULL LIMIT 1) as order_id, (SELECT x.total_amount FROM orders AS x WHERE x.tables_id = a.id AND x.paid_amount IS NULL LIMIT 1) as total_amount, (SELECT x.status FROM orders AS x WHERE x.tables_id = a.id AND x.paid_amount IS NULL LIMIT 1) as order_status FROM tables AS a'),
-        'products' => App\Product::where('active', '1')->get()
+        'products' => App\Product::where('active', '1')->orderBy('product_description')->get()
     ];
 });
 
 Route::get('/order/get/', function() {
-    return App\Order::where('status', '=', 'PENDING')->with(['orderItems', 'table', 'orderItems.products'])->get();
+    return App\Order::where('status', '=', 'PENDING')->with(['orderItems', 'table', 'orderItems.products', 'user'])->get();
 });
 
 Route::get('/order/serve/{id}', function($id) {
-   $order = App\Order::findOrFail($id);
-   $order->status = 'SERVED';
-   $order->save();
+    $order = App\Order::findOrFail($id);
+    $order->status = 'SERVED';
+    $order->save();
 });
 
 Route::get('/dinein/orders/{id}', function ($id) {
@@ -162,3 +158,5 @@ Route::get('/stats', function() {
         )
     );
 });
+
+

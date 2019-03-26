@@ -218,6 +218,7 @@
     export default {
         data() {
             return {
+                user_id: null,
                 selected: null,
                 orderItem: {
                     product_id: null,
@@ -274,6 +275,7 @@
                     this.$Progress.finish();
                     $('#modalPayment').modal('hide');
                     this.displayTables();
+                    var doc = window.open(`/invoice/${this.payment.order_id}`, "self")
                 })
                 .catch(error => {
                     this.$Progress.fail();
@@ -336,7 +338,8 @@
                 this.showConfirmMessage(() => {
                     axios.post('/api/dinein/save', { 
                         table: this.dineInTable, 
-                        items: this.orderItems 
+                        items: this.orderItems,
+                        user: { id: this.user_id } 
                     })
                     .then(res => {
                         this.ToastMessage('Successfully added!', 'success');
@@ -385,6 +388,10 @@
         },
         created() {
             this.displayTables();
+
+            axios.get('/get-user-info').then(res => {
+                this.user_id = res.data;
+            })
         },
         mounted() {
             console.log('Component mounted.')

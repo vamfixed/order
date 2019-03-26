@@ -1999,6 +1999,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
+      user_id: null,
       selected: null,
       orderItem: {
         product_id: null,
@@ -2055,6 +2056,8 @@ __webpack_require__.r(__webpack_exports__);
         $('#modalPayment').modal('hide');
 
         _this.displayTables();
+
+        var doc = window.open("/invoice/".concat(_this.payment.order_id), "self");
       }).catch(function (error) {
         _this.$Progress.fail();
 
@@ -2117,7 +2120,10 @@ __webpack_require__.r(__webpack_exports__);
       this.showConfirmMessage(function () {
         axios.post('/api/dinein/save', {
           table: _this2.dineInTable,
-          items: _this2.orderItems
+          items: _this2.orderItems,
+          user: {
+            id: _this2.user_id
+          }
         }).then(function (res) {
           _this2.ToastMessage('Successfully added!', 'success');
 
@@ -2171,7 +2177,12 @@ __webpack_require__.r(__webpack_exports__);
     }
   },
   created: function created() {
+    var _this7 = this;
+
     this.displayTables();
+    axios.get('/get-user-info').then(function (res) {
+      _this7.user_id = res.data;
+    });
   },
   mounted: function mounted() {
     console.log('Component mounted.');
@@ -2268,6 +2279,17 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -2279,10 +2301,22 @@ __webpack_require__.r(__webpack_exports__);
     serve: function serve(order_id) {
       var _this = this;
 
-      axios.get('/api/order/serve/' + order_id).then(function (res) {
-        _this.loadOrders();
-      }).catch(function (error) {
-        console.log(error);
+      Swal.fire({
+        title: 'Please confirm',
+        text: "Are you sure?",
+        type: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, Im sure!'
+      }).then(function (result) {
+        if (result.value) {
+          axios.get('/api/order/serve/' + order_id).then(function (res) {
+            _this.loadOrders();
+          }).catch(function (error) {
+            console.log(error);
+          });
+        }
       });
     },
     loadOrders: function loadOrders() {
@@ -60028,75 +60062,131 @@ var render = function() {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c("div", [
-    _c(
-      "div",
-      { staticClass: "row justify-content-center" },
-      _vm._l(_vm.orders, function(order, index) {
-        return _c(
+    _vm.orders.length > 0
+      ? _c(
           "div",
-          { key: index, staticClass: "col-xs-12 col-sm-6 col-md-4 col-lg-3" },
-          [
-            _c("div", { staticClass: "card" }, [
-              _c("div", { staticClass: "card-header" }, [
-                _vm._v("Order # " + _vm._s(order.id))
-              ]),
-              _vm._v(" "),
-              _c(
-                "div",
-                { staticClass: "card-body" },
-                [
-                  _c("h5", { staticClass: "card-title" }, [
-                    _vm._v(_vm._s(order.table.table_number))
+          { staticClass: "row justify-content-center" },
+          _vm._l(_vm.orders, function(order, index) {
+            return _c(
+              "div",
+              {
+                key: index,
+                staticClass: "col-xs-12 col-sm-6 col-md-4 col-lg-3"
+              },
+              [
+                _c("div", { staticClass: "card" }, [
+                  _c("div", { staticClass: "card-header" }, [
+                    _vm._v("Order # " + _vm._s(order.id))
                   ]),
                   _vm._v(" "),
-                  _vm._l(order.order_items, function(item, z) {
-                    return _c("p", { key: z, staticClass: "card-text" }, [
+                  _c(
+                    "div",
+                    { staticClass: "card-body" },
+                    [
+                      _c("h5", { staticClass: "card-title" }, [
+                        _vm._v(_vm._s(order.table.table_number))
+                      ]),
+                      _vm._v(" "),
+                      _vm._l(order.order_items, function(item, z) {
+                        return _c("p", { key: z, staticClass: "card-text" }, [
+                          _vm._v(
+                            "\n                        " +
+                              _vm._s(item.qty) +
+                              " x " +
+                              _vm._s(item.products.product_name) +
+                              "\n                    "
+                          )
+                        ])
+                      }),
+                      _vm._v(" "),
+                      _c(
+                        "button",
+                        {
+                          staticClass: "btn btn-xs btn-success",
+                          on: {
+                            click: function($event) {
+                              return _vm.serve(order.id)
+                            }
+                          }
+                        },
+                        [
+                          _vm._v("Serve "),
+                          _c("i", { staticClass: "fas fa-plus-circle" })
+                        ]
+                      )
+                    ],
+                    2
+                  ),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "card-footer" }, [
+                    _c("small", { staticClass: "text-muted" }, [
                       _vm._v(
-                        "\n                        " +
-                          _vm._s(item.qty) +
-                          " x " +
-                          _vm._s(item.products.product_name) +
-                          "\n                    "
+                        " @ " +
+                          _vm._s(
+                            _vm._f("moment")(order.order_date, "from", "now")
+                          ) +
+                          " by " +
+                          _vm._s(order.user.name)
                       )
                     ])
-                  }),
-                  _vm._v(" "),
-                  _c(
-                    "button",
-                    {
-                      staticClass: "btn btn-xs btn-success",
-                      on: {
-                        click: function($event) {
-                          return _vm.serve(order.id)
-                        }
-                      }
-                    },
-                    [
-                      _vm._v("Serve "),
-                      _c("i", { staticClass: "fas fa-plus-circle" })
-                    ]
-                  )
-                ],
-                2
-              ),
-              _vm._v(" "),
-              _c("div", { staticClass: "card-footer" }, [
-                _c("small", { staticClass: "text-muted" }, [
-                  _vm._v(
-                    " @ " +
-                      _vm._s(_vm._f("moment")(order.order_date, "from", "now"))
-                  )
+                  ])
                 ])
-              ])
-            ])
-          ]
+              ]
+            )
+          }),
+          0
         )
-      }),
-      0
-    )
+      : _c("div", { staticClass: "text-center" }, [
+          _c("div", { staticClass: "col-md-4 mx-auto pt-5" }, [
+            _c(
+              "div",
+              {
+                staticClass: "alert alert-warning alert-dismissible fade show",
+                attrs: { role: "alert" }
+              },
+              [
+                _vm._m(0),
+                _vm._v(" "),
+                _c(
+                  "strong",
+                  [
+                    _vm._v("No order for now "),
+                    _c(
+                      "router-link",
+                      {
+                        staticClass: "btn btn-success",
+                        attrs: { to: "/dinein" }
+                      },
+                      [_vm._v("Go to dine in")]
+                    )
+                  ],
+                  1
+                )
+              ]
+            )
+          ])
+        ])
   ])
 }
-var staticRenderFns = []
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c(
+      "button",
+      {
+        staticClass: "close",
+        attrs: {
+          type: "button",
+          "data-dismiss": "alert",
+          "aria-label": "Close"
+        }
+      },
+      [_c("span", { attrs: { "aria-hidden": "true" } }, [_vm._v("×")])]
+    )
+  }
+]
 render._withStripped = true
 
 

@@ -14,4 +14,7 @@ class Order extends Model
     public function table() {
         return $this->belongsTo('App\Table', 'tables_id', 'id');
     }
+    public function user() {
+        return $this->belongsTo('App\User', 'users_id', 'id');
+    }
 }
